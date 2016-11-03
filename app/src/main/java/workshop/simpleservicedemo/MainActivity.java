@@ -25,7 +25,6 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         this.serviceIntent = new Intent(this, CountdownService.class);
-        this.startAndBindCountdownService();
     }
 
     public void startTimeService(View view) {
@@ -47,11 +46,6 @@ public class MainActivity extends BaseActivity {
         if(countdownService != null) {
             countdownService.reset();
             countdownService.startCountdown();
-//            if( serviceConnection != null ) {
-//                unbindService(serviceConnection);
-//                serviceConnection = null;
-//                countdownService = null;
-//            }
         }
     }
 
@@ -63,24 +57,20 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void onPause() {
-        if( serviceConnection != null ) {
-            unbindService(serviceConnection);
-            serviceConnection = null;
-            countdownService = null;
+        Log.d(TAG, "onPause() called");
+        if(countdownService != null) {
+            Log.d(TAG, "onPause() called 2");
+            countdownService.reset();
         }
+        if(serviceConnection != null) {
+            Log.d(TAG, "onPause() called 3");
+            unbindService(serviceConnection);
+            countdownService = null;
+            serviceConnection = null;
+        }
+
         super.onPause();
     }
-
-    @Override
-    protected void onStop() {
-        Log.d(TAG, "onStop() called");
-        if(countdownService != null) {
-            countdownService.reset();
-            stopService(serviceIntent);
-        }
-        super.onStop();
-    }
-
 
     private void startAndBindCountdownService() {
         if(this.countdownService == null) {
